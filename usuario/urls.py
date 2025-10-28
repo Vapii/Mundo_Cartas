@@ -1,8 +1,9 @@
 from django.urls import path
+from django.contrib.auth import views as auth_views
 from . import views
 
 urlpatterns = [
-    # ------Urls para libro------
-    path('', views.book_list, name='home'),
-
+    path('login/', views.login_view, name='login'),
+    path('registro/', views.registro, name='registro'),
+    path('logout/', auth_views.LogoutView.as_view(next_page='home'), name='logout'),
 ]

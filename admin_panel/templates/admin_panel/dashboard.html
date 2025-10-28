@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block contenido %}
+<h2>Panel de Administración</h2>
+
+{% if registros %}
+    <table>
+        <thead>
+            <tr>
+                <th>Usuario</th>
+                <th>Acción</th>
+                <th>Fecha</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for registro in registros %}
+            <tr>
+                <td>{{ registro.usuario.username }}</td>
+                <td>{{ registro.accion }}</td>
+                <td>{{ registro.fecha|date:"d/m/Y H:i" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>No hay registros administrativos recientes.</p>
+{% endif %}
+{% endblock %}
