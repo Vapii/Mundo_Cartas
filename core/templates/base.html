@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <title>Mundo Cartas</title>
+    <link rel="icon" href="{% static 'img/favicon.ico' %}" type="image/x-icon">
+    <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-left">
+                <a href="{% url 'home' %}" class="titulo-home">
+                    <img src="{% static 'img/logo.png' %}" alt="Logo">
+                    <span class="titulo-texto">Mundo Cartas</span>
+                </a>
+            </div>
+
+
+            <div class="navbar-right">
+                <a href="{% url 'home' %}">Inicio</a>
+                <a href="{% url 'lista_productos' %}">Productos</a>
+                <a href="{% url 'ver_carrito' %}">🛒 Carrito</a>
+                {% if user.is_authenticated %}
+                    <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-nav">Cerrar sesión</button>
+                    </form>
+                {% else %}
+                    <a href="{% url 'login' %}" class="btn-nav">Login </a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        {% block contenido %}
+        {% endblock %}
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Mundo Cartas</p>
+        <div class="social-links">
+            <a href="https://www.facebook.com/Mundocartas/?locale=es_LA" target="_blank">Facebook</a>
+            <a href="https://www.instagram.com/mundo_cartas/?hl=es" target="_blank">Instagram</a>
+        </div>
+    </footer>
+</body>
+</html>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const banners = document.querySelectorAll('.banner');
+        let index = 0;
+
+        setInterval(() => {
+            banners[index].classList.remove('active');
+            index = (index + 1) % banners.length;
+            banners[index].classList.add('active');
+        }, 5000);
+    });
+</script>

@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block contenido %}
+<div class="login-wrapper">
+  <div class="login-box">
+    <div class="login-logo">
+      <img src="{% static 'img/logo.png' %}" alt="Mundo Cartas">
+      <h1>MUNDO CARTAS</h1>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" class="login-form">
+      {% csrf_token %}
+
+      {% if form.errors %}
+        <div class="form-errors">
+          {% for field in form %}
+            {% for error in field.errors %}
+              <p class="error-msg">{{ field.label }}: {{ error }}</p>
+            {% endfor %}
+          {% endfor %}
+          {% for error in form.non_field_errors %}
+            <p class="error-msg">{{ error }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      {{ form.username }}
+      {{ form.correo }}
+      {{ form.avatar }}
+      {{ form.password1 }}
+      {{ form.password2 }}
+
+      <div class="login-actions">
+        <label class="ver-password">
+          <input type="checkbox" onclick="togglePassword()"> Ver Contraseña
+        </label>
+        <button type="submit" class="btn-login">Crear Cuenta</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  function togglePassword() {
+    const pass1 = document.querySelector('input[name="password1"]');
+    const pass2 = document.querySelector('input[name="password2"]');
+    const type = pass1?.type === 'password' ? 'text' : 'password';
+    if (pass1) pass1.type = type;
+    if (pass2) pass2.type = type;
+  }
+</script>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block contenido %}
+<section class="producto-detalle">
+    <div class="producto-grid">
+        <div class="producto-imagen">
+            <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}">
+        </div>
+        <div class="producto-info">
+            <h1>{{ producto.nombre }}</h1>
+            <p class="precio">$ {{ producto.precio }}</p>
+            <p><strong>Stock disponible:</strong> {{ producto.stock }}</p>
+            <p><strong>Descripción:</strong></p>
+            <p class="descripcion">{{ producto.descripcion }}</p>
+            <p><strong>Categorías:</strong>
+                {% for categoria in producto.categorias.all %}
+                    <span class="categoria">{{ categoria.nombre }}</span>
+                {% empty %}
+                    <span class="categoria">Sin categoría</span>
+                {% endfor %}
+            </p>
+            <form method="post" action="{% url 'agregar_al_carrito' producto.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn-agregar">Agregar al carrito 🛒</button>
+            </form>
+            <a href="{% url 'lista_productos' %}" class="btn-volver">« Volver al catálogo</a>
+        </div>
+    </div>
+</section>
+{% endblock %}
