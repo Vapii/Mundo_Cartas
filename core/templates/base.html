@@ -6,6 +6,10 @@
     <title>Mundo Cartas</title>
     <link rel="icon" href="{% static 'img/favicon.ico' %}" type="image/x-icon">
     <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    
+    {% block head_extra %}
+    {% endblock %}
 </head>
 <body>
     <nav class="navbar">
@@ -16,7 +20,6 @@
                     <span class="titulo-texto">Mundo Cartas</span>
                 </a>
             </div>
-
 
             <div class="navbar-right">
                 <a href="{% url 'home' %}">Inicio</a>
@@ -46,17 +49,27 @@
             <a href="https://www.instagram.com/mundo_cartas/?hl=es" target="_blank">Instagram</a>
         </div>
     </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const banners = document.querySelectorAll('.banner');
+            let index = 0;
+
+            setInterval(() => {
+                // ... Tu código de banner aquí ...
+                if (banners.length > 0) {
+                    banners[index].classList.remove('active');
+                    index = (index + 1) % banners.length;
+                    banners[index].classList.add('active');
+                }
+            }, 5000);
+        });
+    </script>
+    
+    {% block scripts_extra %}
+    {% endblock %}
+
 </body>
 </html>
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const banners = document.querySelectorAll('.banner');
-        let index = 0;
-
-        setInterval(() => {
-            banners[index].classList.remove('active');
-            index = (index + 1) % banners.length;
-            banners[index].classList.add('active');
-        }, 5000);
-    });
-</script>

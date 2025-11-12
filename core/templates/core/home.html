@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %} 
 
 {% block contenido %}
 <h2>Bienvenido a Mundo Cartas</h2>
@@ -36,20 +37,67 @@
 <section id="productos-home">
     
     <h2>Productos destacados</h2>
-    <div class="grid-productos-home">
-        {% for producto in productos %}
-            <div class="card-producto-home">
-                <a href="{% url 'detalle_producto' producto.id %}">
-                    <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}">
-                </a>
-                <h3 class="nombre-producto">
-                    <a href="{% url 'detalle_producto' producto.id %}">{{ producto.nombre }}</a>
-                </h3>
-                <p>${{ producto.precio }}</p>
-            </div>
-        {% endfor %}
+    
+    <div class="swiper mySwiper">
+        <div class="swiper-wrapper">
+            
+            {% for producto in productos %}
+                
+                <div class="swiper-slide"> 
+                    <div class="card-producto-home">
+                        <a href="{% url 'detalle_producto' producto.id %}">
+                            <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}">
+                        </a>
+                        <h3 class="nombre-producto">
+                            <a href="{% url 'detalle_producto' producto.id %}">{{ producto.nombre }}</a>
+                        </h3>
+                        <p>${{ producto.precio }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+            
+        </div>
+        
+        <div class="swiper-button-prev"></div>
+        <div class="swiper-button-next"></div>
+        
+        <div class="swiper-pagination"></div>
+
     </div>
-</section>
+    </section>
 {% endif %}
 
+{% endblock %}
+
+
+{% block scripts_extra %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Inicialización de Swiper para "Productos destacados"
+        var swiper = new Swiper(".mySwiper", {
+            slidesPerView: 4, 
+            spaceBetween: 30,
+            loop: true,
+            navigation: {
+                nextEl: ".swiper-button-next",
+                prevEl: ".swiper-button-prev",
+            },
+            // Configuración responsiva (para móviles, tablets y escritorios)
+            breakpoints: {
+                0: {
+                    slidesPerView: 1,
+                    spaceBetween: 10,
+                },
+                768: {
+                    slidesPerView: 2,
+                    spaceBetween: 20,
+                },
+                1024: {
+                    slidesPerView: 4,
+                    spaceBetween: 30,
+                },
+            },
+        });
+    });
+</script>
 {% endblock %}
