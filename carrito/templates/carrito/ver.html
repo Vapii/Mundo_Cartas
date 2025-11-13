@@ -1,50 +1,80 @@
 {% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+{# Asegúrate de que 'django.contrib.humanize' está en settings.py #}
 
 {% block contenido %}
-<h2>Tu Carrito</h2>
+<div class="cart-page-wrapper">
+    <h2>Tu Carrito</h2>
 
-{% if items %}
-<div class="carrito-container">
-    <table class="tabla-carrito">
-        <thead>
-            <tr>
-                <th>Producto</th>
-                <th>Precio</th>
-                <th>Cantidad</th>
-                <th>Subtotal</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
+    {# CORREGIDO: Inicia el bloque condicional #}
+    {% if items %}
+    <div class="cart-layout-container">
+        
+        <div class="cart-items-list">
+            <h3>Productos en tu Carrito</h3>
             {% for item in items %}
-            <tr>
-                <td>{{ item.producto.nombre }}</td>
-                <td>${{ item.producto.precio }}</td>
-                <td>{{ item.cantidad }}</td>
-                <td>${{ item.subtotal }}</td>
-                <td>
+            <div class="cart-item-card">
+                
+                {# Imagen del Producto #}
+                <a href="{% url 'detalle_producto' item.producto.id %}">
+                    <img src="{{ item.producto.imagen.url }}" alt="{{ item.producto.nombre }}" class="cart-item-image">
+                </a>
+                
+                <div class="item-details">
+                    <h4 class="item-name">{{ item.producto.nombre }}</h4>
+                    <p class="item-price">Precio Unitario: ${{ item.producto.precio|intcomma }}</p>
+                    
+                    {# Enlace para ELIMINAR EL ÍTEM COMPLETO #}
+                    <a href="{% url 'eliminar_item_completo' item.id %}" class="btn-remove-item">Eliminar</a>
+                </div>
+
+                <div class="item-quantity-control">
+                    
+                    {# Botón MENOS (-) - CORREGIDO #}
+                    {# Apunta a la vista 'eliminar_del_carrito' #}
+                    <form action="{% url 'eliminar_del_carrito' item.id %}" method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-quantity-minus">-</button>
+                    </form>
+                    <span class="item-quantity-display">{{ item.cantidad }}</span>
+                    
+                    {# Botón MÁS (+) #}
                     <form action="{% url 'agregar_al_carrito' item.producto.id %}" method="post" style="display:inline;">
                         {% csrf_token %}
-                        <button type="submit" class="btn btn-sm btn-success">+</button>
+                        <button type="submit" class="btn-quantity-plus">+</button>
                     </form>
-                    <form action="{% url 'eliminar_una_unidad' item.id %}" method="post" style="display:inline;">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-sm btn-danger">-</button>
-                    </form>
-                </td>
-            </tr>
+                </div>
+
+                <div class="item-subtotal">
+                    <span class="subtotal-label">Subtotal</span>
+                    <span class="subtotal-value">${{ item.subtotal|intcomma }}</span>
+                </div>
+            </div>
             {% endfor %}
-        </tbody>
-    </table>
+        </div>
 
-    <div class="total-carrito">
-        <h3>Total: ${{ total }}</h3>
-        <a href="{% url 'confirmar_pago' %}" class="btn-confirmar">Confirmar Compra</a>
-        <a href="{% url 'lista_productos' %}" class="btn-seguir">Seguir Comprando</a>
+        <div class="cart-summary-box">
+            <h3>Resumen del Pedido</h3>
+            
+            <div class="summary-line">
+                <span>Subtotal Productos:</span>
+                <span class="summary-value">${{ total|intcomma }}</span>
+            </div>
+            
+            <div class="summary-total">
+                <span class="total-label">Total a Pagar:</span>
+                <span class="total-value">${{ total|intcomma }}</span>
+            </div>
+            
+            <a href="{% url 'confirmar_pago' %}" class="btn-confirmar-compra">Confirmar Compra</a>
+            <a href="{% url 'lista_productos' %}" class="btn-seguir-comprando">← Seguir Comprando</a>
+        </div>
     </div>
-</div>
 
-{% else %}
-<p>Tu carrito está vacío.</p>
-{% endif %}
+    {# CIERRE DEL BLOQUE CONDICIONAL #}
+    {% else %}
+    <p class="cart-empty-message">Tu carrito está vacío. ¡Es hora de agregar algunas cartas!</p>
+    {% endif %} 
+</div>
 {% endblock %}

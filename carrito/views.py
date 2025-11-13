@@ -64,3 +64,11 @@ def eliminar_del_carrito(request, item_id):
     else:
         item.delete()
     return redirect('ver_carrito')
+
+@login_required
+def eliminar_item_completo(request, item_id):
+    # Esta función se usará para el enlace "Eliminar" que borra la línea completa.
+    item = get_object_or_404(ItemCarrito, id=item_id, usuario=request.user)
+    item.delete()
+    messages.success(request, f"Producto eliminado completamente del carrito.")
+    return redirect('ver_carrito')
