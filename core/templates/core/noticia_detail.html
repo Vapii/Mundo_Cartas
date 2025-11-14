@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{# El contenedor que tendrá el fondo de Yu-Gi-Oh! #}
+<div class="torneo-fondo-wrapper"> 
+{% block content %}
+    <article class="noticia-detalle">
+        <h1>{{ noticia.titulo }}</h1>
+        <img src="{{ noticia.imagen.url }}" alt="{{ noticia.titulo }}">
+        <p>{{ noticia.descripcion }}</p>
+        <a href="{% url 'home' %}" class="btn-volver">« Volver al inicio</a>
+    </article>
+{% endblock contenido %}
+</div>

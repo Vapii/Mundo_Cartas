@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}Editar Grupo de {{ usuario.username }}{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <h2 class="admin-title">Editar Grupo de {{ usuario.username }}</h2>
+
+    <form method="POST" class="form-card">
+        {% csrf_token %}
+
+        <label for="grupo">Seleccionar Grupo</label>
+        <select name="grupo" id="grupo">
+            {% for grupo in grupos %}
+                <option value="{{ grupo.id }}"
+                    {% if grupo in usuario.groups.all %}selected{% endif %}>
+                    {{ grupo.name }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <div class="d-flex justify-content-between mt-4">
+            <button type="submit" class="btn-primary-custom">Guardar</button>
+            <a href="{% url 'admin_usuarios' %}" class="btn-secondary-custom">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+

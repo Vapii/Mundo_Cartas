@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2 class="titulo">Panel de Administración</h2>
+
+<div class="admin-menu">
+
+    <a class="menu-card" href="{% url 'admin_productos' %}">
+        <h3>Gestión de Productos</h3>
+        <p>Crear, editar, eliminar y listar productos.</p>
+    </a>
+
+    <a class="menu-card" href="{% url 'admin_categorias' %}">
+        <h3>Gestión de Categorías</h3>
+        <p>Crear, editar, eliminar y listar categorias.</p>
+    </a>
+
+    <a class="menu-card" href="{% url 'admin_compras' %}">
+        <h3>Historial de Compras</h3>
+        <p>Listar y revisar las compras realizadas.</p>
+    </a>
+    <a class="menu-card" href="{% url 'admin_usuarios' %}">
+        <h3>Lista de usuarios</h3>
+        <p>Listar y revisar usuarios</p>
+    </a>
+
+</div>
+
+{% endblock %}
