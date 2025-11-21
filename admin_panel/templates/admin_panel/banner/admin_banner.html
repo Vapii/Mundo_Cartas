@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Banners activos</h2>
+  <a href="{% url 'crear_banner' %}" class="btn btn-primary mb-3">+ Nuevo banner</a>
+ <table class="table-custom">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Título</th>
+        <th>Imagen</th>
+        <th>Activo</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for banner in banners %}
+      <tr>
+        <td>{{ banner.id }}</td>
+        <td>{{ banner.titulo|default:"(sin título)" }}</td>
+        <td><img src="{{ banner.imagen.url }}" alt="Banner" style="max-height: 80px;"></td>
+            <td>
+                <input type="checkbox" class="toggle-activo" data-id="{{ banner.id }}" {% if banner.activo %}checked{% endif %}>
+            </td>
+        <td>
+          <a href="{% url 'eliminar_banner' banner.id %}" class="btn-accion eliminar">Eliminar</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="5">No hay banners registrados.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+
+<script>
+document.querySelectorAll('.toggle-activo').forEach(checkbox => {
+  checkbox.addEventListener('change', function() {
+    const bannerId = this.dataset.id;
+    const activo = this.checked;
+
+    fetch(`/admin-panel/banners/${bannerId}/toggle-activo/`, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': '{{ csrf_token }}',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ activo })
+    }).then(response => {
+      if (!response.ok) {
+        alert("Error al actualizar el estado");
+        this.checked = !activo; // revertir si falla
+      }
+    });
+  });
+});
+</script>
+
+{% endblock %}
+

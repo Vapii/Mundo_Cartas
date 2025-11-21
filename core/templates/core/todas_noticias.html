@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="noticias-section">
+  <div class="container mt-4">
+  <h1 class="titulo">Todas las noticias</h1>
+  </div>
+  <div class="noticias-columna">
+    {% for noticia in noticias %}
+    <div class="noticia-cuadro-horizontal">
+      {% if noticia.imagen %}
+      <div class="noticia-imagen-lateral">
+        <img src="{{ noticia.imagen.url }}" alt="{{ noticia.titulo }}">
+      </div>
+      {% endif %}
+      <div class="noticia-texto-lateral">
+        <h2>{{ noticia.titulo }}</h2>
+        <p>{{ noticia.descripcion }}</p>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+
+{% endblock %}
+
