@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Editar Producto{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <h2 class="text-center mb-4">Crear Producto</h2>
+
+    <form method="POST" enctype="multipart/form-data" class="card p-4 shadow-sm">
+        {% csrf_token %}
+
+        <div class="mb-3">
+            <label for="nombre" class="form-label">Nombre</label>
+            <input type="text" name="nombre" id="nombre" class="form-control" value="{{ producto.nombre }}">
+        </div>
+
+        <div class="mb-3">
+            <label for="descripcion" class="form-label">Descripción</label>
+            <textarea name="descripcion" id="descripcion" class="form-control">{{ producto.descripcion }}</textarea>
+        </div>
+
+        <div class="mb-3">
+            <label for="precio" class="form-label">Precio</label>
+            <input type="number" name="precio" id="precio" class="form-control" value="{{ producto.precio }}">
+        </div>
+
+        <div class="mb-3">
+            <label for="stock" class="form-label">Stock</label>
+            <input type="number" name="stock" id="stock" class="form-control" value="{{ producto.stock }}">
+        </div>
+
+        <div class="mb-3">
+            <label for="imagen" class="form-label">Imagen</label>
+            <input type="file" name="imagen" id="imagen" class="form-control">
+            {% if producto.imagen %}
+                <div class="mt-2">
+                    <img src="{{ producto.imagen.url }}" alt="Imagen actual" style="max-height: 150px;">
+                </div>
+            {% endif %}
+        </div>
+
+        <input type="text" name="codigo_barras" id="codigo_barras" class="form-control" readonly>
+        <button type="button" id="btn-escanear" class="btn btn-secondary mt-2">
+            <i class="fas fa-barcode"></i> Escanear código
+        </button>
+        <div id="scanner" style="width:100%; height:300px; display:none; background:#000; margin-top:15px;"></div>
+
+
+        <select name="categorias" multiple size="5">
+            {% for categoria in categorias %}
+                <option value="{{ categoria.id }}"
+                    {% if categoria in producto.categorias.all %}selected{% endif %}>
+                    {{ categoria.nombre }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <button type="submit" class="btn btn-primary">Guardar cambios</button>
+        <a href="{% url 'admin_productos' %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts_extra %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
+<script src="{% static 'js/escaner.js' %}"></script>
+{% endblock %}

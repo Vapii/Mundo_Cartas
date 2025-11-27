@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container text-center mt-5">
+    {% if status == "AUTHORIZED" %}
+        <h2 class="text-success">✅ Pago exitoso</h2>
+        <p>Orden: {{ buy_order }}</p>
+        <p>Monto: ${{ amount }}</p>
+    {% else %}
+        <h2 class="text-danger">❌ Pago rechazado</h2>
+        <p>Estado: {{ status }}</p>
+    {% endif %}
+    <a href="{% url 'home' %}" class="btn btn-secondary mt-3">Volver</a>
+</div>
+{% endblock %}

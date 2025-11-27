@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block content %}
+<div class="cart-page-wrapper">
+    <div class="container mt-4">
+        <h2>Tu Carrito</h2>
+    </div>
+    {% if items %}
+    <div class="cart-layout-container">
+
+        <!-- LISTA DE PRODUCTOS -->
+        <div class="cart-items-list">
+            <h3>Productos en tu Carrito</h3>
+
+            {% for item in items %}
+            <div class="cart-item-card">
+
+                <!-- Imagen del producto -->
+                <a href="{% url 'detalle_producto' item.producto.id %}">
+                    <img src="{{ item.producto.imagen.url }}" 
+                         alt="{{ item.producto.nombre }}" 
+                         class="cart-item-image">
+                </a>
+
+                <!-- Información del producto -->
+                <div class="item-details">
+                    <h4 class="item-name">{{ item.producto.nombre }}</h4>
+                    <p class="item-price">Precio Unitario: ${{ item.producto.precio|intcomma }}</p>
+
+                    <!-- Eliminar Ítem Completo -->
+                    <a href="{% url 'eliminar_item_completo' item.id %}" class="btn-remove-item">
+                        Eliminar
+                    </a>
+                </div>
+
+                <div class="item-quantity-control">
+
+                    <form action="{% url 'eliminar_del_carrito' item.id %}" method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-quantity-minus">-</button>
+                    </form>
+                    <span class="item-quantity-display">{{ item.cantidad }}</span>
+
+                    <form action="{% url 'agregar_al_carrito' item.producto.id %}" method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-quantity-plus">+</button>
+                    </form>
+                </div>
+
+                <div class="item-subtotal">
+                    <span class="subtotal-label">Subtotal</span>
+                    <span class="subtotal-value">${{ item.subtotal|intcomma }}</span>
+                </div>
+
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- RESUMEN -->
+        <div class="cart-summary-box">
+            <h3>Resumen del Pedido</h3>
+
+            <div class="summary-line">
+                <span>Subtotal Productos:</span>
+                <span class="summary-value">${{ total|intcomma }}</span>
+            </div>
+
+            <div class="summary-total">
+                <span class="total-label">Total a Pagar:</span>
+                <span class="total-value">${{ total|intcomma }}</span>
+            </div>
+
+            <a href="{% url 'iniciar_pago' %}" class="btn-confirmar-compra">
+                Confirmar Compra
+            </a>
+
+            <a href="{% url 'lista_productos' %}" class="btn-seguir-comprando">
+                ← Seguir Comprando
+            </a>
+        </div>
+
+    </div>
+
+    {% else %}
+    <p class="cart-empty-message">
+        Tu carrito está vacío. ¡Agrega algunos productos!
+    </p>
+    {% endif %}
+</div>
+{% endblock %}

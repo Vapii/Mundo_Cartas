@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% load static %} 
+{% load humanize %} 
+{# Asegúrate de que 'django.contrib.humanize' está en settings.py para el formato de precio #}
+
+{% block content %}
+<div class="catalogo-header">
+    <h2>Catálogo de Productos</h2>
+</div>
+
+<div class="filtros-container">
+    <form method="get" action="." class="formulario-filtros">
+        
+        <label for="categoria">Filtrar por Juego:</label>
+        <select name="categoria" id="categoria" onchange="this.form.submit()">
+            <option value="">Todas las Categorías</option>
+            {% for cat in categorias %}
+                <option value="{{ cat.id }}" 
+                    {% if cat.id == categoria_seleccionada_id %}selected{% endif %}>
+                    {{ cat.nombre }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <label for="orden">Ordenar por:</label>
+        <select name="orden" id="orden" onchange="this.form.submit()">
+            <option value="nombre" {% if orden_seleccionado == 'nombre' %}selected{% endif %}>Nombre (A-Z)</option>
+            <option value="precio_asc" {% if orden_seleccionado == 'precio_asc' %}selected{% endif %}>Precio (Menor a Mayor)</option>
+            <option value="precio_desc" {% if orden_seleccionado == 'precio_desc' %}selected{% endif %}>Precio (Mayor a Menor)</option>
+            <option value="novedad" {% if orden_seleccionado == 'novedad' %}selected{% endif %}>Más Recientes</option>
+        </select>
+
+    </form>
+</div>
+<div class="grid-productos-home">
+    {% for producto in productos %}
+        <div class="card-producto-home">
+            
+            <a href="{% url 'detalle_producto' producto.id %}">
+                <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}">
+            </a>
+            
+            <h3 class="nombre-producto-card">
+                <a href="{% url 'detalle_producto' producto.id %}">{{ producto.nombre }}</a>
+            </h3>
+            
+            <div class="producto-meta">
+                {% if producto.stock > 0 %}
+                    <span class="stock-status en-stock">En Stock {{ producto.stock }}</span>
+                {% else %}
+                    <span class="stock-status agotado">¡Agotado!</span>
+                {% endif %}
+            </div>
+            
+            <div class="precio-destacado-home">
+                ${{ producto.precio|intcomma }} 
+                <span class="moneda">CLP</span> 
+            </div>
+
+            {% if producto.stock > 0 %}
+                <a href="{% url 'agregar_al_carrito' producto.id %}" class="btn-agregar-carrito-home">
+                    Añadir al Carrito
+                </a>
+            {% else %}
+                <button class="btn-agotado-home" disabled>Agotado</button>
+            {% endif %}
+
+        </div>
+    {% empty %}
+        <p>No hay productos disponibles con esos filtros.</p>
+    {% endfor %}
+</div>
+{% endblock content %}
