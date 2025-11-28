@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Producto: {{ producto.nombre }}</h2>
+
+    <h4 class="mt-4">Códigos de barras registrados</h4>
+    <ul class="list-group">
+        {% for codigo in codigos %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span>{{ codigo.codigo }}</span>
+                <small class="text-muted">Registrado el {{ codigo.created_at|date:"d M Y H:i" }}</small>
+            </li>
+        {% empty %}
+            <li class="list-group-item text-muted">Este producto no tiene códigos registrados.</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

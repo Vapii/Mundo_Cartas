@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="login-wrapper">
+  <div class="login-box">
+    <div class="login-logo">
+      <img src="{% static 'img/logo.png' %}" alt="Mundo Cartas">
+      <h1>MUNDO CARTAS</h1>
+    </div>
+
+    <form method="post" class="login-form">
+      {% csrf_token %}
+      {{ form.username }}
+      {{ form.password }}
+
+      <div class="login-actions">
+        <label class="ver-password">
+          <input type="checkbox" onclick="togglePassword()">Ver Contraseña
+        </label>
+      </div>
+
+      <button type="submit" class="btn-login">Login</button>
+
+      <div class="crear-cuenta">
+        <a href="{% url 'registro' %}">Crear Cuenta</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  function togglePassword() {
+    const pass = document.querySelector('input[name="password"]');
+    pass.type = pass.type === 'password' ? 'text' : 'password';
+  }
+</script>
+{% endblock %}

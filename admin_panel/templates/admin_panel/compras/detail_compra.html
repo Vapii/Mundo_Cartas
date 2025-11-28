@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Detalle de Compra</h2>
+</div>
+<div class="compra-info">
+    <p><strong>Usuario:</strong> {{ compra.usuario }}</p>
+    <p><strong>Fecha:</strong> {{ compra.fecha|date:"d M Y H:i" }}</p>
+    <p><strong>Monto total:</strong> ${{ compra.monto }}</p>
+    <p><strong>Estado:</strong> {{ compra.estado }}</p>
+    <p><strong>Método de pago:</strong> {{ compra.metodo }}</p>
+    <p><strong>Autorización:</strong> {{ compra.codigo_autorizacion }}</p>
+</div>
+
+<hr>
+
+<h3>Productos comprados</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Producto</th>
+            <th>Cantidad</th>
+            <th>Precio unitario</th>
+            <th>Subtotal</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in productos %}
+        <tr>
+            <td>{{ item.producto.nombre }}</td>
+            <td>{{ item.cantidad }}</td>
+            <td>${{ item.producto.precio }}</td>
+            <td>${{ item.subtotal }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

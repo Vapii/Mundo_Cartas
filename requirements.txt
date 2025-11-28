@@ -1,0 +1,11 @@
+django
+pillow
+django-crispy-forms
+crispy-bootstrap5
+requests
+transbank-sdkdjango
+pillow
+django-crispy-forms
+crispy-bootstrap5
+requests
+transbank-sdk

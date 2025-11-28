@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block title %}Administrar Usuarios{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Usuarios y Grupos</h2>
+    <form method="get" class="d-flex mb-3" style="gap: 10px;">
+        <input type="text" name="q" placeholder="Buscar por nombre..." 
+            value="{{ query|default_if_none:'' }}" class="form-control" style="max-width: 300px;">
+        
+        <button type="submit" class="btn btn-dark">
+            <i class="fas fa-search"></i> Buscar
+        </button>
+
+        <a href="{% url 'admin_usuarios' %}" class="btn btn-outline-secondary">
+            Limpiar
+        </a>
+    </form>
+
+    <a href="{% url 'crear_usuario' %}" class="btn btn-primary mb-3">+ Crear Usuarios</a>
+    <table class="table-custom">
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Grupos</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for user in usuario %}
+            <tr>
+                <td>{{ user.username }}</td>
+                <td>{{ user.email }}</td>
+                <td>
+                    {% for group in user.groups.all %}
+                        <span class="group-badge">{{ group.name }}</span>
+                    {% empty %}
+                        <span class="text-muted">Sin grupo</span>
+                    {% endfor %}
+                </td>
+                <td>
+                    <a href="{% url 'editar_grupo_usuario' user.id %}" class="btn-action-edit">
+                        Editar grupo
+                    </a>
+                    
+                    <a href="{% url 'toggle_usuario' user.id %}" 
+                        class="btn-action-delete"
+                        onclick="return confirm('¿Seguro que deseas cambiar el estado de este usuario?');">
+                        {% if user.is_active %}
+                            Deshabilitar
+                        {% else %}
+                            Activar
+                        {% endif %}
+                    </a>
+
+                    <a href="{% url 'historial_compras_usuario' user.id %}" class="btn-leer">
+                        Ver historial de compra
+                    </a>
+                </td>
+
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

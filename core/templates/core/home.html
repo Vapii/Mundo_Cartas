@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+{% load static %} 
+
+{% block content %}
+
+<h2>Bienvenido a Mundo Cartas</h2>
+
+<div class="banner-slider">
+    {% for banner in banners %}
+        <div class="banner {% if forloop.first %}active{% endif %}" data-busqueda="{{ banner.titulo }}">
+            <img src="{{ banner.imagen.url }}" alt="{{ banner.titulo }}">
+            <h3 class="banner-titulo">{{ banner.titulo }}</h3>
+        </div>
+    {% empty %}
+        <p>No hay banners activos.</p>
+    {% endfor %}
+</div>
+
+
+{% if noticias %}
+<article class="noticia-horizontal">
+    <div class="noticia-imagen">
+        <img src="{{ noticias.0.imagen.url }}" alt="{{ noticias.0.titulo }}">
+    </div>
+    <div class="noticia-derecha">
+        <h3>{{ noticias.0.titulo }}</h3>
+        <p class="descripcion-limitada">{{ noticias.0.descripcion|truncatechars:200 }}</p>
+        <div class="boton-container">
+            <a href="{% url 'todas_noticias'  %}" class="btn-leer">Saber más</a>
+        </div>
+    </div>
+</article>
+{% endif %}
+
+
+
+{% if productos %}
+<section id="productos">
+    
+    <h2>Productos destacados</h2>
+    
+    <div class="swiper mySwiper">
+        <div class="swiper-wrapper">
+            
+            {% for producto in productos %}
+                
+                <div class="swiper-slide"> 
+                    <div class="card-producto-home">
+                        <a href="{% url 'detalle_producto' producto.id %}">
+                            <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}">
+                        </a>
+                        <h3 class="nombre-producto">
+                            <a href="{% url 'detalle_producto' producto.id %}">{{ producto.nombre }}</a>
+                        </h3>
+                        <p>${{ producto.precio }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+            
+        </div>
+        
+        <div class="swiper-button-prev"></div>
+        <div class="swiper-button-next"></div>
+        
+        <div class="swiper-pagination"></div>
+
+    </div>
+</section>
+
+{% endif %}
+
+{% if productos_recientes %}
+<section id="productos">
+  <h2>Productos recién agregados</h2>
+  <div class="swiper mySwiper">
+    <div class="swiper-wrapper">
+      {% for producto in productos_recientes %}
+      <div class="swiper-slide"> 
+        <div class="card-producto-home">
+          {% if producto.imagen %}
+            <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}" width="150">
+          {% else %}
+            <p class="text-muted">Este producto no tiene imagen asociada.</p>
+          {% endif %}
+          
+          <h3 class="nombre-producto">
+            <a href="{% url 'detalle_producto' producto.id %}">{{ producto.nombre }}</a>
+          </h3>
+          <p>${{ producto.precio }}</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="swiper-button-prev"></div>
+    <div class="swiper-button-next"></div>
+    <div class="swiper-pagination"></div>
+  </div>
+</section>
+
+{% endif %}
+
+
+{% endblock %}
+
+
+{% block scripts_extra %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Inicialización de Swiper para "Productos destacados"
+        var swiper = new Swiper(".mySwiper", {
+            slidesPerView: 4, 
+            spaceBetween: 30,
+            loop: true,
+            navigation: {
+                nextEl: ".swiper-button-next",
+                prevEl: ".swiper-button-prev",
+            },
+            // Configuración responsiva (para móviles, tablets y escritorios)
+            breakpoints: {
+                0: {
+                    slidesPerView: 1,
+                    spaceBetween: 10,
+                },
+                768: {
+                    slidesPerView: 2,
+                    spaceBetween: 20,
+                },
+                1024: {
+                    slidesPerView: 4,
+                    spaceBetween: 30,
+                },
+            },
+        });
+    });
+</script>
+{% endblock %}
