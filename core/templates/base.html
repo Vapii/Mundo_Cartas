@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <title>Mundo Cartas</title>
+    <link rel="icon" href="{% static 'img/favicon.ico' %}" type="image/x-icon">
+    <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+# sadoijasoid#
+    {% block head_extra %}
+    {% endblock %}
+</head>
+<body>
+<nav class="navbar">
+  <div class="navbar-container">
+    <div class="navbar-left">
+      {% if user.is_authenticated and user.is_staff %}
+        <a href="{% url 'dashboard' %}" class="btn-admin">Panel Admin</a>
+      {% endif %}
+      <a href="{% url 'home' %}" class="titulo-home">
+        <img src="{% static 'img/logo.png' %}" alt="Logo">
+        <span class="titulo-texto">Mundo Cartas</span>
+      </a>
+    </div>
+
+    <div class="navbar-center">
+      <form action="/productos/buscar/" method="get" class="navbar-search-form">
+        <input type="text" name="q" placeholder="Buscar productos..." class="navbar-search-input">
+        <button type="submit" class="navbar-search-button">
+          <i class="fas fa-search"></i>
+        </button>
+      </form>
+    </div>
+
+    <div class="navbar-right">
+      <a href="{% url 'home' %}">Inicio</a>
+      <a href="{% url 'lista_productos' %}">Productos</a>
+      <a href="{% url 'ver_carrito' %}">🛒 Carrito</a>
+      {% if user.is_authenticated %}
+        <form action="{% url 'logout' %}" method="post" style="display:inline;">
+          {% csrf_token %}
+          <button type="submit" class="btn-nav">Cerrar sesión</button>
+        </form>
+      {% else %}
+        <a href="{% url 'login' %}" class="btn-nav">Login </a>
+      {% endif %}
+    </div>
+  </div>
+</nav>
+
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer class="footer">
+      <div class="footer-content">
+        <p>&copy; 2025 Mundo Cartas</p>
+        <nav class="social-links" aria-label="Redes sociales">
+          <ul>
+            <li>
+              <a href="https://www.facebook.com/Mundocartas/?locale=es_LA" target="_blank" aria-label="Facebook">
+                <i class="fab fa-facebook-f"></i>
+              </a>
+              <a href="https://www.instagram.com/mundo_cartas/?hl=es" target="_blank" aria-label="Instagram">
+                <i class="fab fa-instagram"></i>
+              </a>
+          </li>
+          </ul>
+        </nav>
+      </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+      const banners = document.querySelectorAll('.banner');
+      const searchForm = document.querySelector('.navbar-search-form');
+      const searchInput = document.querySelector('.navbar-search-input');
+      const toggleBtn = document.getElementById('toggleSearch');
+      const searchBox = document.getElementById('floatingSearch');
+      let index = 0;
+
+      if (banners.length > 0) {
+          setInterval(() => {
+              banners[index].classList.remove('active');
+              index = (index + 1) % banners.length;
+              banners[index].classList.add('active');
+          }, 5000);
+      }
+
+      banners.forEach(banner => {
+          banner.addEventListener('click', () => {
+              const termino = banner.dataset.busqueda;
+              if (termino && searchForm && searchInput) {
+                  searchInput.value = termino;
+                  searchForm.submit();
+              }
+          });
+      });
+
+      if (toggleBtn && searchBox) {
+          toggleBtn.addEventListener('click', () => {
+              searchBox.style.display = (searchBox.style.display === 'block') ? 'none' : 'block';
+          });
+
+          document.addEventListener('keydown', (e) => {
+              if (e.key === 'Escape') {
+                  searchBox.style.display = 'none';
+              }
+          });
+
+          document.addEventListener('click', (e) => {
+              if (!searchBox.contains(e.target) && !toggleBtn.contains(e.target)) {
+                  searchBox.style.display = 'none';
+              }
+          });
+      }
+  });
+</script>
+
+    {% block scripts_extra %}
+    {% endblock %}
+</body>
+</html>

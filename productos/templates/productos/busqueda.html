@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<h2>Resultados para "{{ query }}"</h2>
+
+{% if resultados %}
+  <div class="grid-productos">
+    {% for producto in resultados %}
+      <div class="card-producto">
+        <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}">
+        <h3>{{ producto.nombre }}</h3>
+        <p class="precio">${{ producto.precio }}</p>
+        <p class="descripcion">{{ producto.descripcion|truncatewords:20 }}</p>
+        <a href="{% url 'detalle_producto' producto.id %}" class="btn-ver">Ver más</a>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <p>No se encontraron productos.</p>
+{% endif %}
+{% endblock %}

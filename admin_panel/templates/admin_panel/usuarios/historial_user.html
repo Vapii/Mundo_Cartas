@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Historial de Compras{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Historial de compras de {{ usuario.username }}</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID Compra</th>
+                <th>Fecha</th>
+                <th>Monto</th>
+                <th>Estado</th>
+                <th>Método</th>
+                <th>Detalle</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for compra in compras %}
+            <tr>
+                <td>{{ compra.id }}</td>
+                <td>{{ compra.fecha|date:"d M Y H:i" }}</td>
+                <td>${{ compra.monto }}</td>
+                <td>{{ compra.estado }}</td>
+                <td>{{ compra.metodo }}</td>
+                <td>
+                    <a href="{% url 'detail_compra' compra.id %}" class="btn-editar">
+                        Ver detalle
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="text-center">Este usuario no tiene compras registradas.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

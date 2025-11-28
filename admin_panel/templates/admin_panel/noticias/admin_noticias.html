@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Noticias publicadas</h2>
+  <a href="{% url 'crear_noticia' %}" class="btn btn-primary mb-3">+ Nueva noticia</a>
+<table class="table-custom">
+    <thead>
+      <tr>
+        <th>Título</th>
+        <th>Fecha</th>
+        <th>Imagen</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for noticia in noticias %}
+      <tr>
+        <td>{{ noticia.titulo }}</td>
+        <td>{{ noticia.fecha_publicacion|date:"d/m/Y H:i" }}</td>
+        <td>
+          {% if noticia.imagen %}
+            <img src="{{ noticia.imagen.url }}" alt="Imagen" style="max-height: 80px;">
+          {% else %}
+            —
+          {% endif %}
+        </td>
+        <td>
+          <a href="{% url 'editar_noticia' noticia.id %}" class="btn-accion editar">Editar</a>
+          <a href="{% url 'eliminar_noticia' noticia.id %}" class="btn-accion eliminar">Eliminar</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="4">No hay noticias aún.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

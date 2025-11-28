@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-sm mx-auto" style="max-width: 500px;">
+        <div class="card-body text-center">
+            <h2 class="titulo"> Pago con Webpay</h2>
+
+            {% if error %}
+                <div class="alert alert-danger">{{ error }}</div>
+            {% endif %}
+
+            <p class="fs-5 mb-3">Monto a pagar:</p>
+            <h3 class="text-success mb-4">${{ total|floatformat:0 }}</h3>
+
+            <form action="{% url 'iniciar_pago' %}" method="post">
+                {% csrf_token %}
+                    <button type="submit" class="boton-pago" {% if total <= 0 %}disabled{% endif %}>
+                         Pagar ahora
+                    </button>
+
+            </form>
+
+            {% if total <= 0 %}
+                <small class="text-muted d-block mt-3">Tu carrito está vacío</small>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

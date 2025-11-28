@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Banner{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Editar Banner</h2>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-group mb-3">
+            <label for="titulo">Título</label>
+            <input type="text" name="titulo" id="titulo" class="form-control" value="{{ banner.titulo }}">
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="imagen">Imagen actual</label><br>
+            <img src="{{ banner.imagen.url }}" alt="Banner actual" class="img-fluid mb-2" style="max-height: 200px;">
+            <input type="file" name="imagen" id="imagen" class="form-control">
+        </div>
+
+        <div class="form-check mb-3">
+            <label for="activo" class="form-check-label">Activo</label>
+            <input type="checkbox" name="activo" id="activo" class="form-check-input" {% if banner.activo %}checked{% endif %}>
+        </div>
+
+        <button type="submit" class="btn btn-success">Guardar cambios</button>
+        <a href="{% url 'admin_banners' %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+{% endblock %}
