@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Confirmación de Pago</h2>
+
+{% if pagos %}
+    <table>
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Monto</th>
+                <th>Método</th>
+                <th>Autorización</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for pago in pagos %}
+            <tr>
+                <td>{{ pago.fecha|date:"d/m/Y H:i" }}</td>
+                <td>${{ pago.monto }}</td>
+                <td>{{ pago.metodo }}</td>
+                <td>{{ pago.codigo_autorizacion }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>No se han registrado pagos aún.</p>
+{% endif %}
+
+<a href="{% url 'home' %}">← Volver al inicio</a>
+{% endblock %}
+

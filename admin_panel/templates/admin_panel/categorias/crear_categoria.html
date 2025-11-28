@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Crear Categoría</h2>
+
+<form method="POST" class="form-base">
+    {% csrf_token %}
+
+    <label>Nombre:</label>
+    <input type="text" name="nombre" required>
+
+    <label>Descripción:</label>
+    <textarea name="descripcion" required></textarea>
+
+    <button type="submit" class="btn-verde">Crear Categoría</button>
+</form>
+{% endblock %}

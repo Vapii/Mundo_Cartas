@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}Editar Categoría{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h2>Editar Categoría</h2>
+
+    <form method="POST" class="form-card">
+        {% csrf_token %}
+
+        <div class="field-group">
+            <label for="nombre">Nombre</label>
+            <input type="text"
+                   name="nombre"
+                   id="nombre"
+                   value="{{ categoria.nombre }}"
+                   required>
+        </div>
+
+        <div class="field-group">
+            <label for="descripcion">Descripción</label>
+            <textarea name="descripcion"
+                      id="descripcion"
+                      rows="4"
+                      required>{{ categoria.descripcion }}</textarea>
+        </div>
+
+        <div class="actions">
+            <button type="submit" class="btn-primary">Guardar Cambios</button>
+            <a href="{% url 'admin_categorias' %}" class="btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
