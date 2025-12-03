@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Editar Noticia</h2>
+  <form method="POST" enctype="multipart/form-data" class="card p-4">
+    {% csrf_token %}
+    <div class="mb-3">
+      <label for="titulo" class="form-label">Título</label>
+      <input type="text" name="titulo" id="titulo" class="form-control" value="{{ noticia.titulo }}" required>
+    </div>
+    <div class="mb-3">
+      <label for="descripcion" class="form-label">Descripción</label>
+      <textarea name="descripcion" id="descripcion" rows="5" class="form-control" required>{{ noticia.descripcion }}</textarea>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Imagen actual</label><br>
+      {% if noticia.imagen %}
+        <img src="{{ noticia.imagen.url }}" alt="Imagen" class="img-fluid mb-2" style="max-height: 200px;">
+      {% else %}
+        <p>No hay imagen</p>
+      {% endif %}
+      <input type="file" name="imagen" class="form-control mt-2">
+    </div>
+    <button type="submit" class="btn btn-success">Guardar cambios</button>
+  </form>
+</div>
+{% endblock %}
