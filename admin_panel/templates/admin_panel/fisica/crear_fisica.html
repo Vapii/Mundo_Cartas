@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Registrar compra física</h2>
+
+    <!-- Buscador -->
+    <form method="get" class="d-flex mb-4" style="gap: 10px;">
+        <input type="text" name="q" placeholder="Buscar por nombre..." value="{{ query|default_if_none:'' }}" class="form-control" style="max-width: 300px;">
+        <button type="submit" class="btn btn-dark"><i class="fas fa-search"></i> Buscar</button>
+        <a href="{% url 'admin_ventas_fisicas' %}" class="btn btn-outline-secondary">Limpiar</a>
+    </form>
+
+    <div class="row">
+        <!-- Productos disponibles -->
+        <div class="col-md-6">
+            <h4>Productos</h4>
+            <div class="product-list">
+                {% for p in productos %}
+                <div class="product-card mb-3">
+                    <div class="row">
+                        <div class="col-md-3">
+                            {% if p.imagen %}
+                                <img src="{{ p.imagen.url }}" alt="{{ p.nombre }}" class="img-fluid">
+                            {% else %}
+                                <div class="text-muted text-center">Sin imagen</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <h5>{{ p.nombre }}</h5>
+                            <p>Precio: ${{ p.precio }}</p>
+                            <p>Stock: {{ p.stock }}</p>
+                        </div>
+                        <div class="col-md-3">
+                            <form method="post" class="d-flex flex-column align-items-center">
+                                {% csrf_token %}
+                                <input type="hidden" name="producto_id" value="{{ p.id }}">
+                                <input type="number" name="cantidad" min="1" max="{{ p.stock }}" class="form-control mb-2" style="max-width: 100px;" required>
+                                <button type="submit" name="agregar" class="btn btn-success">Agregar</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <p>No se encontraron productos.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Carrito -->
+        <div class="col-md-6">
+            <h4>Carrito</h4>
+            <div class="cart-summary">
+                {% if carrito %}
+                    {% for item in carrito %}
+                    <div class="cart-item mb-3">
+                        <div class="row">
+                            <div class="col-md-4">
+                                {% for p in productos %}
+                                    {% if p.id == item.producto_id %}
+                                        {% if p.imagen %}
+                                            <img src="{{ p.imagen.url }}" alt="{{ p.nombre }}" class="img-fluid">
+                                        {% else %}
+                                            <div class="text-muted text-center">Sin imagen</div>
+                                        {% endif %}
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            <div class="col-md-4">
+                                <p>{{ item.nombre }}</p>
+                                <p>Cantidad: {{ item.cantidad }}</p>
+                                <p>Precio unitario: ${{ item.precio }}</p>
+                                <p>Subtotal: ${{ item.subtotal }}</p>
+                            </div>
+                            <div class="col-md-4">
+                                <form method="post" style="display:inline;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="producto_id" value="{{ item.producto_id }}">
+                                    <button type="submit" name="quitar" class="btn btn-danger btn-sm">Eliminar</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <div class="total-summary mt-3">
+                        <h5>Total: ${{ total }}</h5>
+                        <form method="post">
+                            {% csrf_token %}
+                            <button type="submit" name="registrar_compra" class="btn btn-primary">Confirmar Compra</button>
+                        </form>
+                    </div>
+                {% else %}
+                    <p>Tu carrito está vacío.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

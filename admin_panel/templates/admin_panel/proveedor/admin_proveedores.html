@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="titulo">Listado de Proveedores</h2>
+    <a href="{% url 'crear_proveedor' %}" class="btn btn-primary mb-3">+ Crear Proveedor</a>
+
+    <table class="table-custom">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Contacto</th>
+                <th>Activo</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for p in proveedores %}
+            <tr>
+                <td>{{ p.nombre }}</td>
+                <td>{{ p.contacto }}</td>
+                <td>
+                    {% if p.activo %}
+                        <span class="badge bg-success">Activo</span>
+                    {% else %}
+                        <span class="badge bg-danger">Inactivo</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{% url 'editar_proveedor' p.id %}" class="btn-accion editar">Editar</a>
+                    <a href="{% url 'eliminar_proveedor' p.id %}"  
+                    class="btn-accion eliminar"
+                    onclick="return confirm('¿Seguro que deseas eliminar este proveedor?');">
+                    Eliminar
+                    </a>
+
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" class="text-center text-muted">No hay proveedores registrados.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

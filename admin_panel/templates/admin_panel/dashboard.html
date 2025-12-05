@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4"> 
+    <h2 class="titulo">Panel de Administración</h2>
+
+    <div class="admin-menu">
+
+        <a class="menu-card" href="{% url 'admin_productos' %}">
+            <h3>Gestión de Productos</h3>
+            <p>Crear, editar, eliminar y listar productos.</p>
+        </a>
+
+        <a class="menu-card" href="{% url 'admin_categorias' %}">
+            <h3>Gestión de Categorías</h3>
+            <p>Crear, editar, eliminar y listar categorias.</p>
+        </a>
+
+        <a class="menu-card" href="{% url 'admin_compras' %}">
+            <h3>Historial de Compras</h3>
+            <p>Listar y revisar las compras realizadas.</p>
+        </a>
+
+        <a class="menu-card" href="{% url 'admin_usuarios' %}">
+            <h3>Gestion Usuarios</h3>
+            <p>Listar y revisar usuarios</p>
+        </a>
+
+        <a class="menu-card" href="{% url 'admin_noticias' %}">
+            <h3>Gestion de Noticias</h3>
+            <p>Noticias, torneos  y demas</p>
+        </a>
+
+        <a class="menu-card" href="{% url 'admin_banners' %}">
+            <h3>Gestion de Banners</h3>
+            <p>Para Carrusel </p>
+        </a>
+        
+        <a class="menu-card" href="{% url 'admin_proveedores' %}">
+            <h3>Gestion de proveedores</h3>
+            <p>Informacion y demas </p>
+        </a>
+        
+        <a class="menu-card" href="{% url 'admin_ventas_fisicas' %}">
+            <h3>Compras Fisicas</h3>
+            <p>para registrar compras en tienda </p>
+        </a>
+
+    </div>
+</div>
+{% endblock %}

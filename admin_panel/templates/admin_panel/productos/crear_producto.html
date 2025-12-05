@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Crear Producto{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <h2 class="text-center mb-4">Crear Producto</h2>
+
+    {% if messages %}
+      <div class="mb-3">
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <form method="POST" enctype="multipart/form-data" class="card p-4 shadow-sm">
+        {% csrf_token %}
+
+        <div class="mb-3">
+            <label for="nombre" class="form-label">Nombre</label>
+            <input type="text" name="nombre" id="nombre" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="descripcion" class="form-label">Descripción</label>
+            <textarea name="descripcion" id="descripcion" class="form-control" required></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label for="precio" class="form-label">Precio</label>
+            <input type="number" name="precio" id="precio" class="form-control" min="0" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="stock" class="form-label">Stock</label>
+            <input type="number" name="stock" id="stock" class="form-control" min="0" required value="0">
+            <small class="text-muted">Puedes ingresar stock manualmente o escanear varias veces para aumentar.</small>
+        </div>
+
+        <div class="mb-3">
+            <label for="imagen" class="form-label">Imagen</label>
+            <input type="file" name="imagen" id="imagen" class="form-control" required accept="image/*">
+        </div>
+
+        <div class="mb-3">
+        <label for="proveedor" class="form-label">Proveedor</label>
+            <select name="proveedor" id="proveedor" class="form-select" required>
+                <option value="">Seleccione un proveedor</option>
+                {% for proveedor in proveedores %}
+                <option value="{{ proveedor.id }}">{{ proveedor.nombre }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="categorias" class="form-label">Categorías</label>
+            <select name="categorias" id="categorias" class="form-select" multiple size="5" required>
+                {% for categoria in categorias %}
+                    <option value="{{ categoria.id }}">{{ categoria.nombre }}</option>
+                {% endfor %}
+            </select>
+            <small class="text-muted">Mantén presionada la tecla Ctrl (Windows) o Cmd (Mac) para seleccionar varias.</small>
+        </div>
+
+        <div class="d-flex justify-content-between mt-4">
+            <button type="submit" class="btn btn-primary">Crear producto</button>
+            <a href="{% url 'admin_productos' %}" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
