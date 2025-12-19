@@ -1,99 +1,152 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-<div class="container mt-4">
-    <h2>Registrar compra física</h2>
 
-    <!-- Buscador -->
-    <form method="get" class="d-flex mb-4" style="gap: 10px;">
-        <input type="text" name="q" placeholder="Buscar por nombre..." value="{{ query|default_if_none:'' }}" class="form-control" style="max-width: 300px;">
-        <button type="submit" class="btn btn-dark"><i class="fas fa-search"></i> Buscar</button>
-        <a href="{% url 'admin_ventas_fisicas' %}" class="btn btn-outline-secondary">Limpiar</a>
-    </form>
+<div class="container mt-4 compra-fisica-page">
+  <h2 class="page-title">Registrar compra física</h2>
 
-    <div class="row">
-        <!-- Productos disponibles -->
-        <div class="col-md-6">
-            <h4>Productos</h4>
-            <div class="product-list">
-                {% for p in productos %}
-                <div class="product-card mb-3">
-                    <div class="row">
-                        <div class="col-md-3">
-                            {% if p.imagen %}
-                                <img src="{{ p.imagen.url }}" alt="{{ p.nombre }}" class="img-fluid">
-                            {% else %}
-                                <div class="text-muted text-center">Sin imagen</div>
-                            {% endif %}
-                        </div>
-                        <div class="col-md-6">
-                            <h5>{{ p.nombre }}</h5>
-                            <p>Precio: ${{ p.precio }}</p>
-                            <p>Stock: {{ p.stock }}</p>
-                        </div>
-                        <div class="col-md-3">
-                            <form method="post" class="d-flex flex-column align-items-center">
-                                {% csrf_token %}
-                                <input type="hidden" name="producto_id" value="{{ p.id }}">
-                                <input type="number" name="cantidad" min="1" max="{{ p.stock }}" class="form-control mb-2" style="max-width: 100px;" required>
-                                <button type="submit" name="agregar" class="btn btn-success">Agregar</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-                {% empty %}
-                <p>No se encontraron productos.</p>
-                {% endfor %}
-            </div>
-        </div>
-
-        <!-- Carrito -->
-        <div class="col-md-6">
-            <h4>Carrito</h4>
-            <div class="cart-summary">
-                {% if carrito %}
-                    {% for item in carrito %}
-                    <div class="cart-item mb-3">
-                        <div class="row">
-                            <div class="col-md-4">
-                                {% for p in productos %}
-                                    {% if p.id == item.producto_id %}
-                                        {% if p.imagen %}
-                                            <img src="{{ p.imagen.url }}" alt="{{ p.nombre }}" class="img-fluid">
-                                        {% else %}
-                                            <div class="text-muted text-center">Sin imagen</div>
-                                        {% endif %}
-                                    {% endif %}
-                                {% endfor %}
-                            </div>
-                            <div class="col-md-4">
-                                <p>{{ item.nombre }}</p>
-                                <p>Cantidad: {{ item.cantidad }}</p>
-                                <p>Precio unitario: ${{ item.precio }}</p>
-                                <p>Subtotal: ${{ item.subtotal }}</p>
-                            </div>
-                            <div class="col-md-4">
-                                <form method="post" style="display:inline;">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="producto_id" value="{{ item.producto_id }}">
-                                    <button type="submit" name="quitar" class="btn btn-danger btn-sm">Eliminar</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
-                    <div class="total-summary mt-3">
-                        <h5>Total: ${{ total }}</h5>
-                        <form method="post">
-                            {% csrf_token %}
-                            <button type="submit" name="registrar_compra" class="btn btn-primary">Confirmar Compra</button>
-                        </form>
-                    </div>
-                {% else %}
-                    <p>Tu carrito está vacío.</p>
-                {% endif %}
-            </div>
-        </div>
+  <!-- Buscador -->
+  <form method="get" class="search-bar mb-4">
+    <div class="search-input">
+      <i class="fas fa-search"></i>
+      <input
+        type="text"
+        name="q"
+        placeholder="Buscar productos..."
+        value="{{ query|default_if_none:'' }}"
+      >
     </div>
+
+    <button type="submit" class="btn-search">Buscar</button>
+    <a href="{% url 'admin_ventas_fisicas' %}" class="btn-clear">Limpiar</a>
+  </form>
+
+  <div class="row g-4">
+    <!-- ================= PRODUCTOS ================= -->
+    <div class="col-12 col-lg-7">
+      <h4 class="section-title">Productos</h4>
+
+      <div class="product-list">
+        {% for p in productos %}
+          <div class="product-card">
+            <div class="product-img">
+              {% if p.imagen %}
+                <img src="{{ p.imagen.url }}" alt="{{ p.nombre }}">
+              {% else %}
+                <div class="no-img">Sin imagen</div>
+              {% endif %}
+            </div>
+
+            <div class="product-info">
+              <div class="product-name">{{ p.nombre }}</div>
+              <div class="product-meta">
+                <span>Precio: <strong>${{ p.precio }}</strong></span>
+                <span>Stock: <strong>{{ p.stock }}</strong></span>
+              </div>
+            </div>
+
+            <div class="product-actions">
+              <form method="post" class="add-form">
+                {% csrf_token %}
+                <input type="hidden" name="producto_id" value="{{ p.id }}">
+                <input
+                  type="number"
+                  name="cantidad"
+                  min="1"
+                  max="{{ p.stock }}"
+                  value="1"
+                  class="qty-input"
+                  required
+                >
+                <button type="submit" name="agregar" class="btn-add">Agregar</button>
+              </form>
+            </div>
+          </div>
+        {% empty %}
+          <p>No se encontraron productos.</p>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- ================= CARRITO ================= -->
+    <div class="col-12 col-lg-5">
+      <h4 class="section-title">Productos en tu Carrito</h4>
+
+      <div class="cart-box">
+        {% if carrito %}
+          {% for item in carrito %}
+            <div class="cart-row">
+              <div class="cart-left">
+                <div class="cart-thumb">
+                  {% if item.imagen %}
+                    <img src="{{ item.imagen }}" alt="{{ item.nombre }}">
+                  {% else %}
+                    <div class="no-img">Sin imagen</div>
+                  {% endif %}
+                </div>
+
+                <div class="cart-details">
+                  <div class="cart-name">{{ item.nombre }}</div>
+                  <div class="cart-price">Precio Unitario: ${{ item.precio }}</div>
+
+                  <div class="cart-controls">
+                    <!-- - -->
+                    <form method="post" class="control-form">
+                      {% csrf_token %}
+                      <input type="hidden" name="producto_id" value="{{ item.producto_id }}">
+                      <button type="submit" name="quitar" class="btn-circle" title="Quitar">−</button>
+                    </form>
+
+                    <div class="qty-number">{{ item.cantidad }}</div>
+
+                    <!-- + -->
+                    <form method="post" class="control-form">
+                      {% csrf_token %}
+                      <input type="hidden" name="producto_id" value="{{ item.producto_id }}">
+                      <button type="submit" name="sumar" class="btn-circle" title="Sumar">+</button>
+                    </form>
+
+                    <!-- eliminar -->
+                    <form method="post" class="control-form ms-2">
+                      {% csrf_token %}
+                      <input type="hidden" name="producto_id" value="{{ item.producto_id }}">
+                      <button type="submit" name="eliminar_item" class="btn-link-danger">
+                        Eliminar
+                      </button>
+                    </form>
+                  </div>
+
+                  <div class="cart-stock">Stock disponible: {{ item.stock }}</div>
+                </div>
+              </div>
+
+              <div class="cart-right">
+                <div class="sub-label">Subtotal</div>
+                <div class="sub-value">${{ item.subtotal }}</div>
+              </div>
+            </div>
+          {% endfor %}
+
+          <div class="cart-footer">
+            <div class="cart-total">
+              <span>Total:</span>
+              <strong>${{ total }}</strong>
+            </div>
+
+            <form method="post" class="mt-3">
+              {% csrf_token %}
+              <button type="submit" name="registrar_compra" class="btn-confirm">
+                Confirmar Compra
+              </button>
+            </form>
+          </div>
+
+        {% else %}
+          <p class="empty-cart">Tu carrito está vacío.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
 </div>
+
 {% endblock %}

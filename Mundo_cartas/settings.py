@@ -166,3 +166,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 WEBPAY_COMMERCE_CODE = "597055555532"   # código de comercio de pruebas
 WEBPAY_API_KEY = "579B532A7440BB0C9079DED94D31EA1615BACEB56610332264630D42D0A36B1C"
 WEBPAY_ENVIRONMENT = "TEST"  # o usar Environment.Integration
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'mundocartas.demo@gmail.com'
+EMAIL_HOST_PASSWORD = 'ostu nxnv niuv xxjj'

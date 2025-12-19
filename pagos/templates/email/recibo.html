@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Recibo de compra - Mundo Cartas</h2>
+<p>Hola {{ user.username }}, tu pago fue aprobado.</p>
+
+<p><b>Orden:</b> {{ pago.buy_order }}</p>
+<p><b>Monto:</b> ${{ pago.monto }}</p>
+<p><b>Método:</b> {{ pago.metodo }}</p>
+<p><b>Código autorización:</b> {{ pago.codigo_autorizacion }}</p>
+<p><b>Fecha:</b> {{ pago.fecha }}</p>
+
+<hr>
+
+<h3>Detalle</h3>
+<ul>
+  {% for it in items %}
+    <li>{{ it.producto.nombre }} x {{ it.cantidad }} ({{ it.producto.precio }})</li>
+  {% endfor %}
+</ul>
+
+<p>Gracias por tu compra ❤️</p>
+{% endblock %}

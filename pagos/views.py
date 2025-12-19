@@ -8,6 +8,31 @@ from transbank.common.options import WebpayOptions
 from transbank.webpay.webpay_plus.transaction import Transaction
 from .utils import get_webpay_options
 from django.urls import reverse
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+from django.conf import settings
+from .utils_boleta import enviar_boleta_por_email
+from django.db import transaction
+
+
+
+def enviar_recibo_email(user, pago_obj, items_compra):
+    if not user.email:
+        return  # si el usuario no tiene email, no enviamos
+
+    subject = f"Recibo de compra - {pago_obj.buy_order}"
+    from_email = settings.DEFAULT_FROM_EMAIL
+    to = [user.email]
+
+    html_content = render_to_string("emails/recibo.html", {
+        "user": user,
+        "pago": pago_obj,
+        "items": items_compra
+    })
+
+    msg = EmailMultiAlternatives(subject, "Tu recibo está en formato HTML.", from_email, to)
+    msg.attach_alternative(html_content, "text/html")
+    msg.send()
 
 
 tx = Transaction(get_webpay_options())
@@ -36,22 +61,53 @@ def iniciar_pago(request):
 @login_required
 def commit_pago(request):
     token = request.GET.get("token_ws")
+
+    if not token:
+        return render(request, "pagos/resultado.html", {
+            "mensaje": "Token inválido."
+        })
+
     tx = Transaction(get_webpay_options())
     result = tx.commit(token)
 
-    status = result.get("status")
+    if result.get("status") != "AUTHORIZED":
+        return render(request, "pagos/resultado.html", {
+            "mensaje": "Hubo un problema con tu pago."
+        })
 
-    if result.get("status") == "AUTHORIZED":
-        pago_obj = Pago.objects.create(
-            usuario=request.user,
-            monto=result.get("amount"),
-            metodo="Webpay",
-            estado="APROBADO",
-            codigo_autorizacion=result.get("authorization_code", "SIN-CODIGO"),
-            buy_order=result.get("buy_order")
+    buy_order = result.get("buy_order")
+
+    items = ItemCarrito.objects.select_related("producto").filter(usuario=request.user)
+    if not items.exists():
+        return render(request, "pagos/resultado.html", {
+            "mensaje": "El carrito está vacío."
+        })
+
+    total = sum(i.producto.precio * i.cantidad for i in items)
+    if int(result.get("amount")) != int(total):
+        return render(request, "pagos/resultado.html", {
+            "mensaje": "Monto inconsistente."
+        })
+
+    with transaction.atomic():
+        pago_obj, created = Pago.objects.get_or_create(
+            buy_order=buy_order,
+            defaults={
+                "usuario": request.user,
+                "monto": result.get("amount"),
+                "metodo": "Webpay",
+                "estado": "APROBADO",
+                "codigo_autorizacion": result.get("authorization_code", "SIN-CODIGO"),
+                "boleta_enviada": False
+            }
         )
 
-        items = ItemCarrito.objects.select_related("producto").filter(usuario=request.user)
+        if not created:
+            return render(request, "pagos/resultado.html", {
+                "pago": pago_obj,
+                "mensaje": "Este pago ya fue procesado."
+            })
+
         for item in items:
             producto = item.producto
             producto.stock = max(producto.stock - item.cantidad, 0)
@@ -63,23 +119,21 @@ def commit_pago(request):
                 cantidad=item.cantidad
             )
 
+        pago_obj = Pago.objects.select_for_update().get(id=pago_obj.id)
+        if not pago_obj.boleta_enviada:
+            try:
+                enviar_boleta_por_email(pago_obj)
+                pago_obj.boleta_enviada = True
+                pago_obj.save(update_fields=["boleta_enviada"])
+            except Exception as e:
+                print("Error enviando boleta:", e)
+
         items.delete()
 
-
-        return render(request, "pagos/resultado.html", {
-            "status": status,
-            "buy_order": result.get("buy_order"),
-            "amount": result.get("amount"),
-            "mensaje": "Pago aprobado correctamente."
-        })
-
-    else:
-        return render(request, "pagos/resultado.html", {
-            "status": status,
-            "buy_order": result.get("buy_order"),
-            "amount": result.get("amount"),
-            "mensaje": "Hubo un problema con tu pago."
-        })
+    return render(request, "pagos/resultado.html", {
+        "pago": pago_obj,
+        "mensaje": "Pago aprobado correctamente."
+    })
 
 
 @login_required

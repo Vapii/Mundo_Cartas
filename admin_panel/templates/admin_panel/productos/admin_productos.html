@@ -4,18 +4,21 @@
 <div class="container mt-4">
 
     <h2>Listado de Productos</h2>
-    <form method="get" class="d-flex mb-3" style="gap: 10px;">
-        <input type="text" name="q" placeholder="Buscar por nombre..." 
-               value="{{ query|default_if_none:'' }}" class="form-control" style="max-width: 300px;">
-        
-        <button type="submit" class="btn btn-dark">
-            <i class="fas fa-search"></i> Buscar
-        </button>
+  <!-- Buscador -->
+  <form method="get" class="search-bar mb-4">
+    <div class="search-input">
+      <i class="fas fa-search"></i>
+      <input
+        type="text"
+        name="q"
+        placeholder="Buscar productos..."
+        value="{{ query|default_if_none:'' }}"
+      >
+    </div>
 
-        <a href="{% url 'admin_productos' %}" class="btn btn-outline-secondary">
-            Limpiar
-        </a>
-    </form>
+    <button type="submit" class="btn-search">Buscar</button>
+    <a href="{% url 'admin_ventas_fisicas' %}" class="btn-clear">Limpiar</a>
+  </form>
 
     <a href="{% url 'crear_producto' %}" class="btn btn-primary mb-3">+ Crear Producto</a>
 

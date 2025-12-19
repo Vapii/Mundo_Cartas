@@ -26,8 +26,12 @@
       {% endif %}
 
       {{ form.username }}
-      {{ form.correo }}
-      {{ form.avatar }}
+      {{ form.email }}
+
+      {% if form.avatar %}
+        {{ form.avatar }}
+      {% endif %}
+
       {{ form.password1 }}
       {{ form.password2 }}
 

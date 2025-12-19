@@ -13,6 +13,9 @@ import json
 from django.db.models import Q
 from utils.decorators import solo_admins
 from productos.models import Producto, Categoria, Proveedor
+from django.db.models import Sum
+from django.db.models.functions import TruncDay, TruncMonth, TruncYear
+from django.utils import timezone
 
 
 @solo_admins
@@ -48,7 +51,7 @@ def admin_productos(request):
         productos = productos.filter(
             Q(nombre__icontains=query) |
             Q(categorias__nombre__icontains=query) |
-            Q(Proveedor__nombre__icontains=query)
+            Q(proveedor__nombre__icontains=query)
         ).distinct()
 
     return render(request, 'admin_panel/productos/admin_productos.html', {
@@ -573,66 +576,131 @@ def eliminar_proveedor(request, pk):
 
 # f i s i c a
 
-@solo_admins
+from django.contrib import messages
+from django.contrib.admin.views.decorators import staff_member_required
+from django.db.models import Q
+from django.shortcuts import get_object_or_404, redirect, render
+
+# @solo_admins  # si tú lo tienes definido, déjalo
 @staff_member_required
 def admin_ventas_fisicas(request):
-    # Búsqueda de productos
     query = request.GET.get("q")
     productos = Producto.objects.all()
-    
+
     if query:
         productos = productos.filter(Q(nombre__icontains=query))
-    
-    # Iniciar el carrito en la sesión si no existe
+
     if "carrito" not in request.session:
         request.session["carrito"] = []
 
     carrito = request.session["carrito"]
 
-    # Agregar producto al carrito
+    # -----------------------------
+    # AGREGAR AL CARRITO
+    # -----------------------------
     if request.method == "POST" and "agregar" in request.POST:
         producto_id = int(request.POST.get("producto_id"))
         cantidad = int(request.POST.get("cantidad"))
+
+        producto = get_object_or_404(Producto, id=producto_id)
+        stock = int(producto.stock)
+
+        if stock <= 0:
+            messages.error(request, f"'{producto.nombre}' no tiene stock disponible.")
+            return redirect("admin_ventas_fisicas")
+
+        # cantidad actual en carrito
+        actual = 0
+        for item in carrito:
+            if item["producto_id"] == producto_id:
+                actual = int(item["cantidad"])
+                break
+
+        nueva = actual + cantidad
+
+        # limitar al stock
+        if nueva > stock:
+            nueva = stock
+            messages.warning(request, f"Solo hay {stock} unidades disponibles de {producto.nombre}.")
+
         encontrado = False
         for item in carrito:
             if item["producto_id"] == producto_id:
-                # Si el producto ya está en el carrito, actualizamos la cantidad
-                item["cantidad"] += cantidad
+                item["cantidad"] = nueva
                 encontrado = True
                 break
+
         if not encontrado:
-            # Si el producto no está en el carrito, lo agregamos
-            carrito.append({"producto_id": producto_id, "cantidad": cantidad})
-        
+            carrito.append({"producto_id": producto_id, "cantidad": nueva})
+
         request.session["carrito"] = carrito
         request.session.modified = True
         return redirect("admin_ventas_fisicas")
 
-    # Registrar compra
-    if request.method == "POST" and "registrar_compra" in request.POST:
+    # -----------------------------
+    # ELIMINAR ITEM COMPLETO (NUEVO)
+    # -----------------------------
+    if request.method == "POST" and "eliminar_item" in request.POST:
+        producto_id = int(request.POST.get("producto_id"))
+
+        nuevo_carrito = []
         for item in carrito:
-            producto = Producto.objects.get(id=item["producto_id"])
+            if item["producto_id"] != producto_id:
+                nuevo_carrito.append(item)
+
+        request.session["carrito"] = nuevo_carrito
+        request.session.modified = True
+        return redirect("admin_ventas_fisicas")
+
+    # -----------------------------
+    # REGISTRAR COMPRA
+    # -----------------------------
+    if request.method == "POST" and "registrar_compra" in request.POST:
+        # 1) Revalidar stock real antes de comprar
+        for item in carrito:
+            p = get_object_or_404(Producto, id=item["producto_id"])
+            if int(item["cantidad"]) > int(p.stock):
+                messages.error(
+                    request,
+                    f"Stock insuficiente para '{p.nombre}'. Disponible: {p.stock}, en carrito: {item['cantidad']}."
+                )
+                return redirect("admin_ventas_fisicas")
+
+        # 2) Registrar compra + pago + descontar stock
+        for item in carrito:
+            producto = get_object_or_404(Producto, id=item["producto_id"])
+            cantidad_item = int(item["cantidad"])
+
             compra = Compra.objects.create(
                 producto=producto,
-                cantidad=item["cantidad"],
+                cantidad=cantidad_item,
                 vendedor=request.user
             )
+
             pago = Pago.objects.create(
                 usuario=request.user,
-                monto=producto.precio * item["cantidad"],
+                monto=producto.precio * cantidad_item,
                 metodo="EFECTIVO",
                 estado="COMPLETADO",
                 codigo_autorizacion=f"COMPRA-{compra.id}",
                 buy_order=f"COMPRA-{compra.id}"
             )
+
             compra.pago = pago
             compra.save()
 
-        # Limpiar el carrito después de la compra
+            # DESCONTAR STOCK
+            producto.stock = int(producto.stock) - cantidad_item
+            producto.save()
+
         request.session["carrito"] = []
+        request.session.modified = True
+        messages.success(request, "Compra registrada y stock actualizado.")
         return redirect("admin_ventas_fisicas")
 
-    # Quitar unidad de un producto en el carrito
+    # -----------------------------
+    # QUITAR 1 UNIDAD
+    # -----------------------------
     if request.method == "POST" and "quitar" in request.POST:
         producto_id = int(request.POST.get("producto_id"))
         nuevo_carrito = []
@@ -641,24 +709,38 @@ def admin_ventas_fisicas(request):
                 if item["cantidad"] > 1:
                     item["cantidad"] -= 1
                     nuevo_carrito.append(item)
+                # si queda en 0, no se agrega => desaparece
             else:
                 nuevo_carrito.append(item)
+
         request.session["carrito"] = nuevo_carrito
         request.session.modified = True
         return redirect("admin_ventas_fisicas")
 
-    # Sumar unidad de un producto en el carrito
+    # -----------------------------
+    # SUMAR 1 UNIDAD
+    # -----------------------------
     if request.method == "POST" and "sumar" in request.POST:
         producto_id = int(request.POST.get("producto_id"))
+
+        producto = get_object_or_404(Producto, id=producto_id)
+        stock = int(producto.stock)
+
         for item in carrito:
             if item["producto_id"] == producto_id:
-                item["cantidad"] += 1
+                if int(item["cantidad"]) >= stock:
+                    messages.warning(request, f"No puedes sumar más: stock máximo {stock} para {producto.nombre}.")
+                else:
+                    item["cantidad"] = int(item["cantidad"]) + 1
                 break
+
         request.session["carrito"] = carrito
         request.session.modified = True
         return redirect("admin_ventas_fisicas")
 
-    # Enriquecer el carrito para el template (calcular subtotal y total)
+    # -----------------------------
+    # ARMAR CARRITO PARA TEMPLATE
+    # -----------------------------
     carrito_enriquecido = []
     total = 0
     for item in carrito:

@@ -8,8 +8,10 @@ class Pago(models.Model):
     metodo = models.CharField(max_length=50)
     estado = models.CharField(max_length=20)
     codigo_autorizacion = models.CharField(max_length=100, default="SIN-CODIGO")
-    buy_order = models.CharField(max_length=100, default="SIN-ORDEN")
+    buy_order = models.CharField(max_length=100, unique=True, default="SIN-ORDEN")
     fecha = models.DateTimeField(auto_now_add=True)
+    boleta_enviada = models.BooleanField(default=False) 
+
 
 class ItemCompra(models.Model):
     pago = models.ForeignKey(Pago, on_delete=models.CASCADE, related_name="items")

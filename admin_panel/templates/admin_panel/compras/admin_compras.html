@@ -5,23 +5,20 @@
     
 
     <!-- Buscador por número de compra -->
-        <form method="get" class="row g-3 mb-4 align-items-center justify-content-center">
-            <div class="col-md-5">
-                <input type="text" name="q" class="form-control rounded-pill px-4"
-                    placeholder="Buscar por número de compra o Buy Order..."
-                    value="{{ request.GET.q|default_if_none:'' }}">
-            </div>
+  <form method="get" class="search-bar mb-4">
+    <div class="search-input">
+      <i class="fas fa-search"></i>
+      <input
+        type="text"
+        name="q"
+        placeholder="Buscar productos..."
+        value="{{ query|default_if_none:'' }}"
+      >
+    </div>
 
-            <div class="col-auto">
-                <button type="submit" class="btn btn-primary rounded-pill px-4">
-                    <i class="fas fa-search me-2"></i> Buscar
-                </button>
-                <a href="{% url 'admin_compras' %}" class="btn btn-outline-secondary rounded-pill px-4">
-                    Limpiar
-                </a>
-            </div>
-        </form>
-
+    <button type="submit" class="btn-search">Buscar</button>
+    <a href="{% url 'admin_ventas_fisicas' %}" class="btn-clear">Limpiar</a>
+  </form>
 
 
     <div class="table-responsive shadow-sm rounded-3 border">
